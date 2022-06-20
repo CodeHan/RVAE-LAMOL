@@ -250,7 +250,7 @@ def train(task_ids, model):
                 is_extra[i] = is_extra[i].to(args.device_ids[i])
 
             if args.use_id_task and args.id_task_gamma>=0:
-                losses = get_syntax_losses(parallel_model, cqa, Y, gen_X, gen_Y, idt_X, idt_Y,task_ids,is_extra,train_loss_fct,warmup,ep,freeze_gpt2)
+                losses = get_idt_losses(parallel_model, cqa, Y, gen_X, gen_Y, idt_X, idt_Y,task_ids,is_extra,train_loss_fct,warmup,ep,freeze_gpt2)
             else:
                 losses = get_losses(parallel_model, cqa, Y, gen_X, gen_Y, train_loss_fct)
             loss = sum([losses['qa_loss'],losses['lm_loss'],losses['idt_loss'],losses['reconstruct_loss'],losses['kld']])
