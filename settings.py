@@ -175,7 +175,7 @@ def parse_args():
     if args.use_sep:
         special_tokens["sep_token"] = '__sep__'
     if args.use_id_task:
-        special_tokens["syntax_token"] = '__idt__'
+        special_tokens["idt_token"] = '__idt__'
 
 
     model_class, tokenizer_class, config_class = MODEL_CLASSES[args.model_name]
@@ -203,7 +203,7 @@ def parse_args():
     if args.use_sep:
         tokens_weight[special_token_ids["sep_token"]] = args.tokens_weight
     if args.use_id_task:
-        tokens_weight[special_token_ids["syntax_token"]] = args.tokens_weight
+        tokens_weight[special_token_ids["idt_token"]] = args.tokens_weight
     args.max_len = model_config.n_positions
 
     data_attrs_path = os.path.join(BASE_DIR,"data_attrs.json")

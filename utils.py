@@ -99,7 +99,7 @@ def save_temp(t,tail=''):
 
 
 
-def get_syntax_losses(parallel_model, cqa, Y, gen_X, gen_Y,idt_X, idt_Y, task_ids, is_extra, loss_fct, warmup, current_epoch,freeze_gpt):
+def get_idt_losses(parallel_model, cqa, Y, gen_X, gen_Y,idt_X, idt_Y, task_ids, is_extra, loss_fct, warmup, current_epoch,freeze_gpt):
     if "lll" in args.seq_train_type:
 
         
@@ -301,13 +301,13 @@ class QADataset(Dataset):
         self.eos_token = SPECIAL_TOKEN_IDS["eos_token"]
         self.pad_token = SPECIAL_TOKEN_IDS["pad_token"]
         if args.use_id_task:
-            self.syntax_token = SPECIAL_TOKEN_IDS["syntax_token"]
+            self.idt_token = SPECIAL_TOKEN_IDS["idt_token"]
         cur_task = TOKENIZER.decode(gen_token).strip().strip('_')
         cur_task_idx = args.tasks.index(cur_task)
         ask_tasks=[get_gen_token(args.tasks[i]) for i in range(cur_task_idx + 1)]+['__unk__']
-        syntax_question = 'is the example from %s?' % (
+        idt_question = 'is the example from %s?' % (
             ' or '.join(ask_tasks))
-        self.syntax_question = TOKENIZER.encode(syntax_question)
+        self.idt_question = TOKENIZER.encode(idt_question)
         if not isinstance(data_paths, list):
             data_paths = [data_paths]
 
@@ -394,14 +394,14 @@ class QADataset(Dataset):
             gen_X_example = self.concat_example([gen_token], context, [], question, [self.ans_token], answer, [])
             gen_Y_example = self.concat_example([], context, [], question, [self.ans_token], answer, [self.eos_token])
 
-        ###add syntax example###
+        ###add idt example###
         idt_X_example,idt_Y_example=[],[]
         if args.use_id_task:
             if args.use_sep:
-                idt_X_example = self.concat_example([],context,[self.sep_token],self.syntax_question,[self.syntax_token],[gen_token],[])
+                idt_X_example = self.concat_example([],context,[self.sep_token],self.idt_question,[self.idt_token],[gen_token],[])
                 idt_Y_example = self.concat_example([], [], [], [], [],[gen_token], [self.eos_token])
             else:
-                idt_X_example = self.concat_example([], context, [], self.syntax_question, [self.syntax_token], [gen_token],[])
+                idt_X_example = self.concat_example([], context, [], self.idt_question, [self.idt_token], [gen_token],[])
                 idt_Y_example = self.concat_example([], [], [], [], [], [gen_token], [self.eos_token])
             idt_Y_example = [FILL_VAL]*(len(idt_X_example)-len(idt_Y_example))+idt_Y_example
 
